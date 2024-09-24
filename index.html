@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000; 
+        }
+        .calculator {
+            background-color: #121212;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        #display {
+            width: 100%;
+            height: 50px;
+            font-size: 28px;
+            text-align: right;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+        button {
+            width: 70px;
+            height: 50px;
+            font-size: 18px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+        }
+        button.function-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+        button.number-btn {
+            background-color: #333; 
+            color: white;
+        }
+        button.operator-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" disabled>
+        <div>
+            <button class="function-btn" onclick="clearDisplay()">C</button>
+            <button class="function-btn" onclick="deleteLast()">⌫</button>
+            <button class="function-btn" onclick="appendConstant(Math.PI)">π</button>
+            <button class="function-btn" onclick="appendConstant(Math.E)">e</button>
+        </div>
+        <div>
+            <button class="function-btn" onclick="setFunction('log')">log</button>
+            <button class="function-btn" onclick="setFunction('ln')">ln</button>
+            <button class="function-btn" onclick="setFunction('sqrt')">√</button>
+        </div>
+        <div>
+            <button class="function-btn" onclick="calculateTrig('sin')">sin</button>
+            <button class="function-btn" onclick="calculateTrig('cos')">cos</button>
+            <button class="function-btn" onclick="calculateTrig('tan')">tan</button>
+        </div>
+        <div>
+            <button class="number-btn" onclick="appendValue('1')">1</button>
+            <button class="number-btn" onclick="appendValue('2')">2</button>
+            <button class="number-btn" onclick="appendValue('3')">3</button>
+            <button class="operator-btn" onclick="appendValue('+')">+</button>
+        </div>
+        <div>
+            <button class="number-btn" onclick="appendValue('4')">4</button>
+            <button class="number-btn" onclick="appendValue('5')">5</button>
+            <button class="number-btn" onclick="appendValue('6')">6</button>
+            <button class="operator-btn" onclick="appendValue('-')">-</button>
+        </div>
+        <div>
+            <button class="number-btn" onclick="appendValue('7')">7</button>
+            <button class="number-btn" onclick="appendValue('8')">8</button>
+            <button class="number-btn" onclick="appendValue('9')">9</button>
+            <button class="operator-btn" onclick="appendValue('*')">×</button>
+        </div>
+        <div>
+            <button class="number-btn" onclick="appendValue('0')">0</button>
+            <button class="operator-btn" onclick="appendValue('/')">÷</button>
+            <button class="operator-btn" onclick="calculate()">=</button>
+        </div>
+        <div>
+            <button class="function-btn" onclick="appendValue('(')">(</button>
+            <button class="function-btn" onclick="appendValue(')')">)</button>
+        </div>
+    </div>
+
+    <script>
+        let currentFunction = ''; 
+        let isNewInput = true; 
+        let lastResult = null; 
+
+        function clearDisplay() {
+            document.getElementById('display').value = '';
+            currentFunction = ''; 
+            isNewInput = true; 
+            lastResult = null; 
+        }
+
+        function deleteLast() {
+            let currentValue = document.getElementById('display').value;
+            document.getElementById('display').value = currentValue.slice(0, -1);
+        }
+
+        function appendToDisplay(value) {
+            document.getElementById('display').value += value;
+        }
+
+        function calculate() {
+            let displayValue = document.getElementById('display').value;
+
+            try {
+                
+                let result;
+                if (currentFunction) {
+                    
+                    const argument = displayValue.slice(displayValue.lastIndexOf('(') + 1).replace(')', ''); 
+                    if (currentFunction === 'log') {
+                        result = Math.log10(eval(argument)); 
+                    } else if (currentFunction === 'ln') {
+                        result = Math.log(eval(argument)); 
+                    } else if (currentFunction === 'sqrt') {
+                        result = Math.sqrt(eval(argument)); 
+                    } else if (currentFunction === 'sin') {
+                        result = Math.sin(eval(argument) * (Math.PI / 180)); 
+                    } else if (currentFunction === 'cos') {
+                        result = Math.cos(eval(argument) * (Math.PI / 180)); 
+                    } else if (currentFunction === 'tan') {
+                        result = Math.tan(eval(argument) * (Math.PI / 180)); 
+                    }
+                } else {
+                    
+                    result = eval(displayValue);
+                }
+
+                
+                lastResult = result; 
+                document.getElementById('display').value = lastResult; 
+                currentFunction = ''; 
+            } catch (e) {
+                document.getElementById('display').value = 'Error'; 
+                lastResult = null; 
+            }
+        }
+
+        function setFunction(func) {
+            currentFunction = func; 
+            if (lastResult !== null) {
+                document.getElementById('display').value = lastResult + `${func}(`; 
+            } else {
+                document.getElementById('display').value += `${func}(`; 
+            }
+            isNewInput = false;
+        }
+
+        function calculateTrig(func) {
+            setFunction(func);
+        }
+
+        function appendValue(value) {
+            const display = document.getElementById('display');
+
+            if (isNewInput && !isNaN(value)) {
+                display.value = ''; 
+                isNewInput = false; 
+            }
+
+            display.value += value; 
+        }
+
+        function appendConstant(value) {
+            const display = document.getElementById('display');
+            
+            if (isNewInput) {
+                display.value = ''; 
+                isNewInput = false; 
+            }
+
+            document.getElementById('display').value += value;
+        }
+    </script>
+</body>
+</html>
