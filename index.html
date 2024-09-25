@@ -104,100 +104,66 @@
             <button class="function-btn" onclick="appendValue(')')">)</button>
         </div>
     </div>
-
     <script>
-        let currentFunction = ''; 
-        let isNewInput = true; 
-        let lastResult = null; 
-
+        let isNewInput = true;
+        let lastResult = null;
+        let currentFunction = '';
+    
         function clearDisplay() {
             document.getElementById('display').value = '';
-            currentFunction = ''; 
-            isNewInput = true; 
-            lastResult = null; 
+            isNewInput = true;
+            lastResult = null;
         }
-
+    
         function deleteLast() {
             let currentValue = document.getElementById('display').value;
             document.getElementById('display').value = currentValue.slice(0, -1);
         }
-
+    
         function appendToDisplay(value) {
             document.getElementById('display').value += value;
         }
-
+    
         function calculate() {
             let displayValue = document.getElementById('display').value;
-
+    
             try {
-                
-                let result;
-                if (currentFunction) {
-                    
-                    const argument = displayValue.slice(displayValue.lastIndexOf('(') + 1).replace(')', ''); 
-                    if (currentFunction === 'log') {
-                        result = Math.log10(eval(argument)); 
-                    } else if (currentFunction === 'ln') {
-                        result = Math.log(eval(argument)); 
-                    } else if (currentFunction === 'sqrt') {
-                        result = Math.sqrt(eval(argument)); 
-                    } else if (currentFunction === 'sin') {
-                        result = Math.sin(eval(argument) * (Math.PI / 180)); 
-                    } else if (currentFunction === 'cos') {
-                        result = Math.cos(eval(argument) * (Math.PI / 180)); 
-                    } else if (currentFunction === 'tan') {
-                        result = Math.tan(eval(argument) * (Math.PI / 180)); 
-                    }
-                } else {
-                    
-                    result = eval(displayValue);
-                }
-
-                
-                lastResult = result; 
-                document.getElementById('display').value = lastResult; 
-                currentFunction = ''; 
+                displayValue = displayValue.replace(/log\(/g, 'Math.log10(');
+                displayValue = displayValue.replace(/ln\(/g, 'Math.log(');
+                displayValue = displayValue.replace(/sqrt\(/g, 'Math.sqrt(');
+    
+                displayValue = displayValue.replace(/sin\(/g, 'Math.sin((' + Math.PI + '/180)*');
+                displayValue = displayValue.replace(/cos\(/g, 'Math.cos((' + Math.PI + '/180)*');
+                displayValue = displayValue.replace(/tan\(/g, 'Math.tan((' + Math.PI + '/180)*');
+    
+                let result = eval(displayValue);
+    
+                lastResult = result;
+                document.getElementById('display').value = lastResult;
             } catch (e) {
                 document.getElementById('display').value = 'Error'; 
-                lastResult = null; 
+                lastResult = null;
             }
         }
-
+    
         function setFunction(func) {
             currentFunction = func; 
-            if (lastResult !== null) {
-                document.getElementById('display').value = lastResult + `${func}(`; 
-            } else {
-                document.getElementById('display').value += `${func}(`; 
-            }
+            appendToDisplay(func + '('); 
             isNewInput = false;
         }
-
+    
+        function appendValue(value) {
+            const display = document.getElementById('display');
+            display.value += value;
+        }
+    
+        function appendConstant(value) {
+            const display = document.getElementById('display');
+            display.value += value;
+        }
+    
         function calculateTrig(func) {
             setFunction(func);
         }
-
-        function appendValue(value) {
-            const display = document.getElementById('display');
-
-            if (isNewInput && !isNaN(value)) {
-                display.value = ''; 
-                isNewInput = false; 
-            }
-
-            display.value += value; 
-        }
-
-        function appendConstant(value) {
-            const display = document.getElementById('display');
-            
-            if (isNewInput) {
-                display.value = ''; 
-                isNewInput = false; 
-            }
-
-            document.getElementById('display').value += value;
-        }
     </script>
-</body>
-</html>
+    
